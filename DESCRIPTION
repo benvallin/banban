@@ -37,5 +37,5 @@ Imports:
     tibble,
     tidyr,
     tidyselect
-    
-    
+URL: https://github.com/benvallin/banban
+BugReports: https://github.com/benvallin/banban/issues
