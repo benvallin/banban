@@ -1,5 +1,5 @@
 Package: banban
-Title: My Functions Written In 2020
+Title: Ben's functions
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Benjamin",
