@@ -1,6 +1,6 @@
-#' Perform automated univariate/multivariate ANOVA and posthoc test
+#' Perform automated ANOVA and posthoc test
 #'
-#' @description get_complex_anova() performs automated univariate/multivariate ANOVA and subsequent posthoc test on a set of dependent variables. In case of multivariate design, interaction between independent variables is authorised.
+#' @description get_complex_anova() performs automated ANOVA and subsequent posthoc test on a set of dependent variables.
 #'
 #' @details Normality of residuals is tested with Shapiro–Wilk test. In case of normality, the model is used for all subsequent analyses.
 #' In case of non-normality, the dependent variable is subjected to Box-Cox transformation and normality of residuals is tested again with Shapiro–Wilk test. In case of normality, the Box-Cox-transformed model is used for all subsequent analyses.
@@ -11,7 +11,7 @@
 #'
 #' In case of normal/homoscedastic data, classic type III ANOVA is performed. In case of normal/heteroscedastic data, type III ANOVA with White adjustment is performed.
 #'
-#' Factors with a significant effect in ANOVA are further subjected to posthoc test. In case of multivariate design with significant interaction effect(s), only the significant interaction term(s) are subjected to posthoc analysis. For normal/homoscedastic data, posthoc test is performed by comparison of estimated marginal means and one of the following adjustment methods: "tukey", "scheffe", "sidak", "bonferroni", "dunnettx", "mvt", and "none". For normal/heteroscedastic data, posthoc test is performed with Games-Howell test.
+#' Factors with a significant effect in ANOVA are further subjected to posthoc test. In case of significant interaction effect(s), only the significant interaction term(s) are subjected to posthoc analysis. For normal/homoscedastic data, posthoc test is performed by comparison of estimated marginal means and one of the following adjustment methods: "tukey", "scheffe", "sidak", "bonferroni", "dunnettx", "mvt", and "none". For normal/heteroscedastic data, posthoc test is performed with Games-Howell test.
 #'
 #' @param tibble a tibble.
 #' @param grp a string indicating the column which contains the names of the dependent variables.
