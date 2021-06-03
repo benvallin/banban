@@ -1,6 +1,6 @@
 #' Perform automated ANOVA with random effect and posthoc test
 #'
-#' @description get_mixed_mod_anova() performs automated univariate/multivariate ANOVA including random effect(s) and subsequent posthoc test on a set of dependent variables.
+#' @description get_mixed_mod_anova() performs automated ANOVA including random effect(s) and subsequent posthoc test on a set of dependent variables.
 #'
 #' @details Normality of residuals is tested with Shapiro–Wilk test. In case of normality, the model is used for all subsequent analyses.
 #' In case of non-normality, the dependent variable is subjected to log transformation and normality of residuals is tested again with Shapiro–Wilk test.
@@ -11,7 +11,7 @@
 #' Type I ANOVA is performed with the Kenward-Roger's approximation to degrees of freedom.
 #'
 #' Factors with a significant effect in ANOVA are further subjected to posthoc test.
-#' In case of multivariate design with significant interaction effect(s), only the significant interaction term(s) are subjected to posthoc analysis.
+#' In case of significant interaction effect(s), only the significant interaction term(s) are subjected to posthoc analysis.
 #' Posthoc test is performed by comparison of estimated marginal means and one of the following adjustment methods: "tukey", "scheffe", "sidak", "bonferroni", "dunnettx", "mvt", and "none".
 #'
 #' @param tibble a tibble.

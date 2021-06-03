@@ -46,7 +46,7 @@ A tibble containing, for each dependent variable, an ANOVA (possibly with random
 Also included are residuals vs observed values plot, fitted values vs residuals plot, and qq plot.
 }
 \description{
-get_mixed_mod_anova() performs automated univariate/multivariate ANOVA including random effect(s) and subsequent posthoc test on a set of dependent variables.
+get_mixed_mod_anova() performs automated ANOVA including random effect(s) and subsequent posthoc test on a set of dependent variables.
 }
 \details{
 Normality of residuals is tested with Shapiro–Wilk test. In case of normality, the model is used for all subsequent analyses.
@@ -58,7 +58,7 @@ Additionally, normality and homoscedasticity can be graphically inspected throug
 Type I ANOVA is performed with the Kenward-Roger's approximation to degrees of freedom.
 
 Factors with a significant effect in ANOVA are further subjected to posthoc test.
-In case of multivariate design with significant interaction effect(s), only the significant interaction term(s) are subjected to posthoc analysis.
+In case of significant interaction effect(s), only the significant interaction term(s) are subjected to posthoc analysis.
 Posthoc test is performed by comparison of estimated marginal means and one of the following adjustment methods: "tukey", "scheffe", "sidak", "bonferroni", "dunnettx", "mvt", and "none".
 }
 \examples{
