@@ -10,7 +10,6 @@
 #'
 #' @export
 #'
-#' @importFrom tidyselect matches
 #' @importFrom dplyr arrange
 #' @importFrom dplyr full_join
 #' @importFrom dplyr group_by
@@ -32,6 +31,7 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
 #' @importFrom tidyr unnest
+#' @importFrom tidyselect matches
 #'
 #' @examples
 #'
