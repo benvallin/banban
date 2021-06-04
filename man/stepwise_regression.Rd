@@ -14,6 +14,8 @@ stepwise_regression(tibble, dep_var, indep_oi, grps, hackfull = FALSE)
 \item{indep_oi}{a string indicating the column with the values of the independent variables of interest.}
 
 \item{grps}{a character vector indicating i) the column with the names of the independent variables of interest, and optionally ii) the column(s) with the categorical variable(s) on which the independent variables of interest should be conditioned.}
+
+\item{hackfull}{a logical indicating whether the analysis should be restricted to the full models.}
 }
 \value{
 A tibble containing, for each (possibly conditioned) independent variable of interest, all five models (original full, minimal, forward selection, stepwise selection, backward elimination) and their respective statistics (AIC, adjusted R square, F statistic, t statistic related to the independent variable of interest, "sign" label).

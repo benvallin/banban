@@ -31,7 +31,6 @@
 #' @importFrom readr read_delim
 #' @importFrom rlang !!
 #' @importFrom rlang :=
-#' @importFrom rlang as_list
 #' @importFrom stats setNames
 #' @importFrom stringr str_c
 #' @importFrom stringr str_detect
@@ -40,6 +39,7 @@
 #' @importFrom tidyr pivot_wider
 #' @importFrom tidyr unnest
 #' @importFrom tidyselect everything
+#' @importFrom xml2 as_list
 #' @importFrom xml2 read_xml
 #'
 #' @examples

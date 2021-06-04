@@ -15,7 +15,7 @@
 #' @param dep_var a string indicating the column with the values of the dependent variable.
 #' @param indep_oi a string indicating the column with the values of the independent variables of interest.
 #' @param grps a character vector indicating i) the column with the names of the independent variables of interest, and optionally ii) the column(s) with the categorical variable(s) on which the independent variables of interest should be conditioned.
-#'
+#' @param hackfull a logical indicating whether the analysis should be restricted to the full models.
 #' @return A tibble containing, for each (possibly conditioned) independent variable of interest, all five models (original full, minimal, forward selection, stepwise selection, backward elimination) and their respective statistics (AIC, adjusted R square, F statistic, t statistic related to the independent variable of interest, "sign" label).
 #'
 #' @export
