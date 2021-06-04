@@ -3,6 +3,7 @@
 export(calculate_n0)
 export(calculate_rq)
 export(choose_on_aic)
+export(format_fluostar.omega_data)
 export(format_ms_data)
 export(gather_amplicons)
 export(get_2c_comp)
