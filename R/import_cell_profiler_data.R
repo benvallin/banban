@@ -15,6 +15,7 @@
 #'
 #' @export
 #'
+#' @importFrom dplyr bind_cols
 #' @importFrom dplyr bind_rows
 #' @importFrom dplyr filter
 #' @importFrom dplyr full_join
