@@ -61,7 +61,7 @@ gather_amplicons <- function(path, datafiles, max_out = FALSE) {
                                    fluo_plate = pmap(list(fluo_plate,
                                                           infos_plate,
                                                           datafiles),
-                                                     ~ select(..1, X1, Cycle, ..2$well) %>%
+                                                     ~ select(..1, X1 = `...1`, Cycle, ..2$well) %>%
                                                        rename_at(.vars = -c(1, 2), .funs = function(., ..3) str_c(., ..3, sep = "_"))),
                                    infos_plate = map2(infos_plate, datafiles,
                                                       ~ mutate(.x, well = str_c(well, .y, sep = "_")))) %>%
