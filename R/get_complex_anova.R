@@ -257,7 +257,7 @@ get_complex_anova <- function(tibble, grp = NULL, lhs, rhs, base.size = 14, lege
                                        }),
            posthoc.nm = map2_chr(target.terms.posthoc,
                                  best.anova.nm,
-                                 ~ if (is.na(.x)) {
+                                 ~ if (length(.x) == 1L && is.na(.x)) {
                                    NA_character_
                                  } else {
                                    case_when(.y %in% c("anova.mod", "anova.mod.boxcox", "anova.mod.log") ~ str_c("EMM comparison with ", adjust.emm.comp, " adjustment"),
@@ -268,7 +268,7 @@ get_complex_anova <- function(tibble, grp = NULL, lhs, rhs, base.size = 14, lege
                                    posthoc.nm,
                                    sign.interaction.term.best.anova,
                                    best.mod.val),
-                              ~ if(is.na(..1)) {
+                              ~ if(length(..1) == 1L && is.na(..1)) {
                                 NULL
                               } else if (str_detect(..2, "EMM") & is.na(..3)) {
                                 emmeans(..4, as.list(..1)) %>% pairs(adjust = adjust.emm.comp) %>% after.emmeans
@@ -293,7 +293,7 @@ get_complex_anova <- function(tibble, grp = NULL, lhs, rhs, base.size = 14, lege
                                        posthoc.nm, #2
                                        posthoc.val, #3
                                        sign.interaction.term.best.anova), #4
-                                  ~ if (is.na(..1)) {
+                                  ~ if (length(..1) == 1L && is.na(..1)) {
                                     NULL
                                   } else if (str_detect(..2, "EMM")) {
                                     if (isFALSE(spe.contr) | is.na(..4)) {
