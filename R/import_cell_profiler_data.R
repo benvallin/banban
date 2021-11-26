@@ -88,7 +88,13 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
                                                       object_type = .y) %>%
                                                select(-c(main.object_number, object_number))
     )) %>%
-    select(-has.Parent_RelateObjects_main.object.structure.nm)
+    select(-has.Parent_RelateObjects_main.object.structure.nm) %>%
+  ####### ADDED #######
+    mutate(IdentifyPrimaryObjects.val.empty = map_lgl(.x = IdentifyPrimaryObjects.val,
+                                                      .f = ~ifelse(nrow(.x) == 0L, TRUE, FALSE))) %>%
+    filter(IdentifyPrimaryObjects.val.empty == FALSE) %>%
+    select(-IdentifyPrimaryObjects.val.empty)
+  ####### ADDED #######
 
   internal.object.data <- RelateObjects.data %>%
     filter(RelateObjects.nm %in% IdentifyPrimaryObjects.data$IdentifyPrimaryObjects.nm) %>%
