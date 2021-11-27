@@ -74,7 +74,7 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
   main.object.data <- RelateObjects.data %>%
     filter(RelateObjects.nm == main.object.structure.nm) %>%
     unnest(cols = RelateObjects.val) %>%
-    mutate(!!main.object.var.nm := str_c("img_", image_number, "_", main.object.nm, "_", ObjectNumber)) %>%
+    mutate(!!main.object.var.nm := str_c(image_id, "_", main.object.nm, "_", ObjectNumber)) %>%
     select(image_id, image_number, all_of(main.object.var.nm), everything(), -c(image_number, RelateObjects.nm, PathName_czi)) %>%
     nest(!!str_c(main.object.structure.nm, "_data") := -all_of(main.object.var.nm))
 
