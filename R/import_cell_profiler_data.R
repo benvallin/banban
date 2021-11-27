@@ -90,11 +90,14 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
                                                                                  FALSE))) %>%
     filter(has.Parent_RelateObjects_main.object.structure.nm == TRUE) %>%
     mutate(IdentifyPrimaryObjects.val = map2(IdentifyPrimaryObjects.val, IdentifyPrimaryObjects.nm,
-                                             ~ .x %>% select(image_number = ImageNumber,
-                                                             main.object_number = !!str_c("Parent_RelateObjects_", main.object.structure.nm),
-                                                             object_number = ObjectNumber) %>%
+                                             ~ .x %>%
+                                               mutate(image_id = str_remove(FileName_czi, ".czi")) %>%
+                                               select(image_id,
+                                                      image_number = ImageNumber,
+                                                      main.object_number = !!str_c("Parent_RelateObjects_", main.object.structure.nm),
+                                                      object_number = ObjectNumber) %>%
                                                filter(main.object_number != 0) %>%
-                                               mutate(!!main.object.var.nm := str_c("img_", image_number, "_", main.object.nm, "_", main.object_number),
+                                               mutate(!!main.object.var.nm := str_c(image_id, "_", main.object.nm, "_", main.object_number),
                                                       temp_object_id = str_c(.y, "_", object_number),
                                                       object_type = .y) %>%
                                                select(-c(main.object_number, object_number))
@@ -114,14 +117,14 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
                                       select(image_id, image_number, temp_object_id, everything(), -object_number)))
 
   all.data <- map2(IdentifyPrimaryObjects.data$IdentifyPrimaryObjects.val, internal.object.data$RelateObjects.val,
-                   ~ full_join(.x, .y, by = c("image_number", "temp_object_id", "object_type")) %>%
+                   ~ full_join(.x, .y, by = c("image_id", "image_number", "temp_object_id", "object_type")) %>%
                      mutate(object_id = str_c(.[[!!main.object.var.nm]], "_", temp_object_id)) %>%
                      select(object_id, everything(), -c(image_number, temp_object_id, image_id, FileName_czi, PathName_czi))) %>%
     map(~ nest(.data = .x, data = -c(all_of(main.object.var.nm), object_type))) %>%
     bind_rows() %>%
     pivot_wider(names_from = "object_type", values_from = "data") %>%
     rename_if(.predicate = function(x) is.list(x), .funs = function(x) str_c(x, "_data")) %>%
-    full_join(main.object.data, by = "neuron_id") %>%
+    full_join(main.object.data, by = str_c(main.object.nm, "_id")) %>%
     mutate(image_id = map_chr(.[[str_c(main.object.structure.nm, "_data")]], ~ .x$image_id),
            !!str_c(main.object.structure.nm, "_data") := map(.[[str_c(main.object.structure.nm, "_data")]], ~ select(.x, -image_id))) %>%
     select(image_id, all_of(main.object.var.nm), str_c(main.object.structure.nm, "_data"), everything())
