@@ -41,6 +41,7 @@
 #' @importFrom tidyr nest
 #' @importFrom tidyr pivot_wider
 #' @importFrom tidyr unnest
+#' @importFrom tidyselect all_of
 #' @importFrom tidyselect everything
 #' @importFrom xml2 as_list
 #' @importFrom xml2 read_xml
@@ -54,11 +55,18 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
                                       main.object.structure.nm = "cell_body",
                                       metadata = FALSE) {
 
+  options(warn = -1)
+
+  message("\nProcessing CellProfiler data...\n")
+
   main.object.var.nm <- str_c(main.object.nm, "_id")
 
-  RelateObjects.data <- read_delim(str_c(prefix, RelateObjects.data.files.list), col_names = "RelateObjects.nm", delim = "\n") %>%
+  RelateObjects.data <- read_delim(str_c(prefix, RelateObjects.data.files.list),
+                                   col_names = "RelateObjects.nm",
+                                   delim = "\n",
+                                   show_col_types = FALSE) %>%
     mutate(RelateObjects.val = map(RelateObjects.nm,
-                                   ~ read_csv(str_c(prefix, .x)) %>%
+                                   ~ read_csv(str_c(prefix, .x), show_col_types = FALSE) %>%
                                      mutate(image_id = str_remove(FileName_czi, ".czi")) %>%
                                      rename(image_number = ImageNumber))) %>%
     mutate(RelateObjects.nm = str_remove(RelateObjects.nm, "RelateObjects_") %>% str_remove(., ".csv"))
@@ -67,11 +75,14 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
     filter(RelateObjects.nm == main.object.structure.nm) %>%
     unnest(cols = RelateObjects.val) %>%
     mutate(!!main.object.var.nm := str_c("img_", image_number, "_", main.object.nm, "_", ObjectNumber)) %>%
-    select(image_id, image_number, main.object.var.nm, everything(), -c(image_number, RelateObjects.nm, FileName_czi, PathName_czi)) %>%
-    nest(!!str_c(main.object.structure.nm, "_data") := -main.object.var.nm)
+    select(image_id, image_number, all_of(main.object.var.nm), everything(), -c(image_number, RelateObjects.nm, FileName_czi, PathName_czi)) %>%
+    nest(!!str_c(main.object.structure.nm, "_data") := -all_of(main.object.var.nm))
 
-  IdentifyPrimaryObjects.data <- read_delim(str_c(prefix, IdentifyPrimaryObjects.data.files.list), col_names = "IdentifyPrimaryObjects.nm", delim = "\n") %>%
-    mutate(IdentifyPrimaryObjects.val = map(IdentifyPrimaryObjects.nm, ~ read_csv(str_c(prefix, .x))),
+  IdentifyPrimaryObjects.data <- read_delim(str_c(prefix, IdentifyPrimaryObjects.data.files.list),
+                                            col_names = "IdentifyPrimaryObjects.nm",
+                                            delim = "\n",
+                                            show_col_types = FALSE) %>%
+    mutate(IdentifyPrimaryObjects.val = map(IdentifyPrimaryObjects.nm, ~ read_csv(str_c(prefix, .x), show_col_types = FALSE)),
            IdentifyPrimaryObjects.nm = str_remove(IdentifyPrimaryObjects.nm, "IdentifyPrimaryObjects_") %>% str_remove(".csv"),
            has.Parent_RelateObjects_main.object.structure.nm = map_lgl(IdentifyPrimaryObjects.val,
                                                                        ~ if_else(some(str_detect(colnames(.x), str_c("Parent_RelateObjects_", main.object.structure.nm)), isTRUE),
@@ -89,12 +100,10 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
                                                select(-c(main.object_number, object_number))
     )) %>%
     select(-has.Parent_RelateObjects_main.object.structure.nm) %>%
-  ####### ADDED #######
     mutate(IdentifyPrimaryObjects.val.empty = map_lgl(.x = IdentifyPrimaryObjects.val,
                                                       .f = ~ifelse(nrow(.x) == 0L, TRUE, FALSE))) %>%
     filter(IdentifyPrimaryObjects.val.empty == FALSE) %>%
     select(-IdentifyPrimaryObjects.val.empty)
-  ####### ADDED #######
 
   internal.object.data <- RelateObjects.data %>%
     filter(RelateObjects.nm %in% IdentifyPrimaryObjects.data$IdentifyPrimaryObjects.nm) %>%
@@ -105,28 +114,39 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
                                       select(image_id, image_number, temp_object_id, everything(), -object_number)))
 
   all.data <- map2(IdentifyPrimaryObjects.data$IdentifyPrimaryObjects.val, internal.object.data$RelateObjects.val,
-                   ~ full_join(.x, .y) %>%
+                   ~ full_join(.x, .y, by = c("image_number", "temp_object_id", "object_type")) %>%
                      mutate(object_id = str_c(.[[!!main.object.var.nm]], "_", temp_object_id)) %>%
                      select(object_id, everything(), -c(image_number, temp_object_id, image_id, FileName_czi, PathName_czi))) %>%
-    map(~ nest(.data = .x, data = -c(main.object.var.nm, object_type))) %>%
+    map(~ nest(.data = .x, data = -c(all_of(main.object.var.nm), object_type))) %>%
     bind_rows() %>%
     pivot_wider(names_from = "object_type", values_from = "data") %>%
     rename_if(.predicate = function(x) is.list(x), .funs = function(x) str_c(x, "_data")) %>%
-    full_join(main.object.data) %>%
+    full_join(main.object.data, by = "neuron_id") %>%
     mutate(image_id = map_chr(.[[str_c(main.object.structure.nm, "_data")]], ~ .x$image_id),
            !!str_c(main.object.structure.nm, "_data") := map(.[[str_c(main.object.structure.nm, "_data")]], ~ select(.x, -image_id))) %>%
-    select(image_id, main.object.var.nm, str_c(main.object.structure.nm, "_data"), everything()) %>%
-    {if(metadata == TRUE) {
-      full_join(., .[,"image_id"] %>%
-                  unique %>%
-                  mutate(metadata = map(image_id, ~ read_xml(str_c(prefix, "metadata/", .,".tif_metadata.xml")) %>%
-                                          as_list() %>%
-                                          {.$ImageMetadata$Scaling$Items[1:2]} %>%
-                                          map(~ as.double(.x$Value[[1]])) %>%
-                                          bind_cols %>%
-                                          setNames(nm = c("scaling_x", "scaling_y")))) %>%
-                  unnest(cols = metadata))
-    } else {
-      .
-    }}
+    select(image_id, all_of(main.object.var.nm), str_c(main.object.structure.nm, "_data"), everything())
+
+  if(metadata == TRUE) {
+
+    message("Processing metadata...\n")
+
+    all.data <- full_join(all.data, all.data[,"image_id"] %>%
+                            unique %>%
+                            mutate(metadata = map(image_id, ~ suppressMessages(read_xml(str_c(prefix, "metadata/", .,".tif_metadata.xml"),
+                                                                                        options = c("NOBLANKS")) %>%
+                                                                                 as_list() %>%
+                                                                                 {.$ImageMetadata$Scaling$Items[1:2]} %>%
+                                                                                 map(~ as.double(.x$Value[[1]])) %>%
+                                                                                 bind_cols %>%
+                                                                                 setNames(nm = c("scaling_x", "scaling_y"))))) %>%
+                            unnest(cols = metadata),
+                          by = "image_id")
+  }
+
+  message("Done!\n")
+
+  options(warn = 0)
+
+  all.data
+
 }
