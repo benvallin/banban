@@ -75,7 +75,7 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
     filter(RelateObjects.nm == main.object.structure.nm) %>%
     unnest(cols = RelateObjects.val) %>%
     mutate(!!main.object.var.nm := str_c("img_", image_number, "_", main.object.nm, "_", ObjectNumber)) %>%
-    select(image_id, image_number, all_of(main.object.var.nm), everything(), -c(image_number, RelateObjects.nm, FileName_czi, PathName_czi)) %>%
+    select(image_id, image_number, all_of(main.object.var.nm), everything(), -c(image_number, RelateObjects.nm, PathName_czi)) %>%
     nest(!!str_c(main.object.structure.nm, "_data") := -all_of(main.object.var.nm))
 
   IdentifyPrimaryObjects.data <- read_delim(str_c(prefix, IdentifyPrimaryObjects.data.files.list),
@@ -147,6 +147,7 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
 
   options(warn = 0)
 
-  all.data
+  all.data %>% mutate(FileName_czi = map_chr(.x = !!str_c(main.object.structure.nm, "_data"),
+                                             .f = ~ unique(.x$FileName_czi)))
 
 }
