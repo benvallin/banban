@@ -147,7 +147,7 @@ import_cell_profiler_data <- function(RelateObjects.data.files.list,
 
   options(warn = 0)
 
-  all.data %>% mutate(FileName_czi = map_chr(.x = !!str_c(main.object.structure.nm, "_data"),
-                                             .f = ~ unique(.x$FileName_czi)))
+  all.data %>% mutate(FileName_czi = map_chr(.x = .[[str_c(main.object.structure.nm, "_data")]],
+                                             .f = ~ gsub(x = unique(.x$FileName_czi), pattern = ".czi", replacement = "")))
 
 }
