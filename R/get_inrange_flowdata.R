@@ -8,6 +8,7 @@
 #'
 #' @export
 #'
+#' @importFrom flowCore fsApply
 #' @importFrom flowCore keyword
 #' @importFrom flowCore Subset
 #'
