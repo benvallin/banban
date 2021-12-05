@@ -10,6 +10,7 @@
 #'
 #' @importFrom flowCore fsApply
 #' @importFrom flowCore keyword
+#' @importFrom flowCore rectangleGate
 #' @importFrom flowCore Subset
 #'
 #' @examples
