@@ -2,12 +2,12 @@
 % Please edit documentation in R/get_parameter_voltage.R
 \name{get_parameter_voltage}
 \alias{get_parameter_voltage}
-\title{Get in range flow cytometry data}
+\title{Get voltage values of flow cytometry parameters}
 \usage{
 get_parameter_voltage(fs, check_identical = FALSE)
 }
 \arguments{
-\item{fs}{a flowSet to tidy.}
+\item{fs}{a flowSet to analyse.}
 
 \item{check_identical}{a logical indicating if the equality of voltage values should be checked.}
 }
