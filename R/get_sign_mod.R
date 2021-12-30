@@ -24,7 +24,6 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr rename
 #' @importFrom magrittr %>%
-#' @importFrom mcp.project fdr
 #' @importFrom purrr map
 #' @importFrom purrr map_chr
 #' @importFrom rlang !!
@@ -38,6 +37,92 @@
 #' @examples
 #'
 get_sign_mod <- function(tibble, method, FDR = 0.2) {
+
+  ### START mcp.project ###
+
+  reject=function(sorted,criticals){
+    m=length(sorted)
+    stopifnot( length(criticals) == m )
+    indicators= sorted<criticals # Marking p-values below the critical values
+
+    if(!any(indicators)) return(list(cutoff=0,cut.index=0))
+
+    cut.index=max((1:m)[indicators])
+
+    cutoff=sorted[cut.index] #The highest rejected p-value
+
+    return( list(cutoff=cutoff,cut.index=cut.index) )
+  }
+
+  bh.adjust=function(sorted,m,m0,constant=1){
+    adjusted=rep(NA,m)
+    temp.min=sorted[m]
+    min.ind=rep(0,m)
+    for (i in m:1) {
+      temp= min(m0*sorted[i]*constant / i,1)
+      if  ( temp <= temp.min  ) {
+        temp.min = temp
+        min.ind[i]=1
+      }
+      adjusted[i]=temp.min
+    }
+    return(adjusted)
+  }
+
+  bh=function(sorted, q, m, adjust = F, m0 = m, pi0, constant = 1){
+    # cat("Calling bh \n")
+    flush.console
+    if (missing(m0) & !missing(pi0))
+      m0 = pi0 * m
+    else {
+      criticals = (1:m) * q/(m0 * constant)
+      cutoff = reject(sorted, criticals)
+      rejected = sorted <= cutoff$cutoff
+      adjusted = rep(NA, m)
+      if (adjust)
+        adjusted = bh.adjust(sorted, m = m, m0 = m0, constant = constant)
+      multiple.pvals = data.frame(original.pvals = sorted,
+                                  criticals = criticals, rejected = rejected, adjusted.pvals = adjusted)
+      output = list(Cutoff = cutoff, Pvals = multiple.pvals)
+      return(output)
+    }
+  }
+
+  fdr=function(x,q,method='BH',pi0,lambda=0.5, m0){
+    #Input checking
+    stopifnot( is.numeric(x) , is.numeric(q) , any(x<1) , any(x>0) , q<1 , q>0 )
+    m=length(x)
+    if(!missing(m0)) stopifnot( is.numeric(m0) , m0<m , m0>=0 )
+    else if(!missing(m0) & !missing(pi0)) stop("Only m0 or pi0 can be specified.")
+    else if (method!='Oracle' && !missing(m0) ) stop("m0 can only be specified for the Oracle method.")
+    else if(missing(m0) & !missing(pi0)) m0=pi0*m
+
+    ranks=rank(x)
+    sorted=sort(x)
+
+    # Selecting the propoer procedure
+    output=switch(method,
+                  'BH'=bh(sorted=sorted,q=q,adjust=TRUE,m=m),
+                  'General Dependency'=bh(sorted=sorted,q=q,m=m,constant=log(m),adjust=TRUE),
+                  'Oracle'=bh(sorted=sorted,q=q,m=m,m0=m0,adjust=TRUE),
+                  'BH Adaptive'=adaptive.bh(sorted=sorted,q=q,m=m),
+                  'ST Adaptive'=adaptive.st(sorted=sorted,q=q,m=m,lambda),
+                  'Two Stage'=two.stage(sorted=sorted,q=q,m=m),
+                  'Multiple Step Down'=multiple.down(sorted=sorted,q=q,m=m),
+                  'Multiple Step Up'=stop("Not implemented yet.") ,#look in file "multiple up (unused).r",
+                  'Smoother'=stop("Not implemented yet.") ,
+                  'Bootstrap'=stop("Not implemented yet."),
+                  'Median ST Adaptive'=stop("Not implemented yet.")
+    )
+
+    #Arranging output
+    output$Pvals=output$Pvals[ranks,]
+    output=list(method=method,q=q,Cutoff=output[['Cutoff']],Pvals=output[['Pvals']])
+    class(output)=c(class(output),'fdr')
+    return(output)
+  }
+
+  ### END mcp.project ###
 
   method <- enexpr(method)
 
