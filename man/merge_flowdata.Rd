@@ -9,7 +9,7 @@ merge_flowdata(filenames, give_indiv = FALSE)
 \arguments{
 \item{filenames}{a character vector providing the path and name of the FCS files to merge into a flowFrame.}
 
-\item{giv_indiv}{a logical indicating if flowFrames corresponding to each FCS file should also be provided.}
+\item{give_indiv}{a logical indicating if flowFrames corresponding to each FCS file should also be provided.}
 }
 \value{
 a flowFrame corresponding to the combined FCS files. If giv_indiv = TRUE, merge_flowdata() returns a list composed of the combined_ff and the indiv_ff.

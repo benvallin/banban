@@ -3,7 +3,7 @@
 #' merge_flowdata() merges the flow cytometry data from different FCS files into a single flowFrame.
 #'
 #' @param filenames a character vector providing the path and name of the FCS files to merge into a flowFrame.
-#' @param giv_indiv a logical indicating if flowFrames corresponding to each FCS file should also be provided.
+#' @param give_indiv a logical indicating if flowFrames corresponding to each FCS file should also be provided.
 #'
 #' @return a flowFrame corresponding to the combined FCS files. If giv_indiv = TRUE, merge_flowdata() returns a list composed of the combined_ff and the indiv_ff.
 #'
