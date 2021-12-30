@@ -26,7 +26,6 @@ Imports:
     lmerTest,
     lmtest,
     magrittr,
-    mcp.project,
     purrr,
     readr,
     readxl,
