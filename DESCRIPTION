@@ -19,6 +19,7 @@ Imports:
     emmeans,
     EnvStats,
     flowCore,
+    flowWorkspace,
     forcats,
     generics,
     ggplot2,
