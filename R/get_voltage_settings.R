@@ -1,11 +1,11 @@
-#' Get voltage values of flow cytometry parameters
+#' Get voltage settings of flow cytometry parameters
 #'
-#' get_parameter_voltage() extracts the voltage value of parameters in each flowFrame of a flowSet. If requested, it also checks that all voltage values of a parameter are identical across the flowFrames.
+#' get_voltage_settings() extracts the voltage settings of parameters in each flowFrame of a flowSet. If requested, it also checks that all voltage settings of a parameter are identical across the flowFrames.
 #'
 #' @param fs a flowSet to analyse.
-#' @param check_identical a logical indicating if the equality of voltage values should be checked.
+#' @param check_identical a logical indicating if the equality of voltage settings should be checked.
 #'
-#' @return a data frame summarizing the voltage values of parameters included in the flowSet. If check_identical = TRUE, get_parameter_voltage() returns a list composed of the voltage_table and the voltage_check.
+#' @return a data frame summarizing the voltage settings of parameters included in the flowSet. If check_identical = TRUE, get_voltage_settings() returns a list composed of the voltage_table and the voltage_check.
 #'
 #' @export
 #'
@@ -13,10 +13,9 @@
 #' @importFrom flowCore keyword
 #' @importFrom tidyr nest
 #'
-#'
 #' @examples
 #'
-get_parameter_voltage <- function(fs, check_identical = FALSE) {
+get_voltage_settings <- function(fs, check_identical = FALSE) {
 
   output <- fsApply(x = fs,
                     FUN = function(ff) {
