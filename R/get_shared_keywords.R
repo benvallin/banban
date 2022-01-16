@@ -11,6 +11,7 @@
 #'
 #' @importFrom flowCore fsApply
 #' @importFrom flowCore keyword
+#' @importFrom flowWorkspace lapply
 #'
 #' @examples
 #'
