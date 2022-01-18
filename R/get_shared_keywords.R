@@ -31,8 +31,9 @@ get_shared_keywords <- function(flow.obj, invert = FALSE) {
 
     out <- lapply(X = keyword.names,
                   FUN = function(x) {
-                    unique(lapply(X = keyword.values, FUN = function(y) { y[[x]] }))
-                  })
+                    as.character(unique(lapply(X = keyword.values, FUN = function(y) { y[[x]] })))
+                    })
+
     names(out) <- keyword.names
 
     keyword.length <- vapply(X = out, FUN = function(x) { length(x) }, FUN.VALUE = vector(mode = "integer", length = 1))
@@ -47,8 +48,7 @@ get_shared_keywords <- function(flow.obj, invert = FALSE) {
     out <- lapply(X = keyword.names,
                   FUN = function(x) {
                     as.character(lapply(X = keyword.values, FUN = function(y) { y[[x]] }))
-
-                  })
+                    })
 
     names(out) <- keyword.names
 
